@@ -4,7 +4,7 @@ module.exports = {
     */
     region : 'us-east-1',
     zone   : 'us-east-1e',
-    username_prefix : 'cloud_castle',
+    username_prefix : 'cloud_castle_',
     /*
     Create a random user name and password for bitcoind.
     */
