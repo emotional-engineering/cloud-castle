@@ -6,7 +6,8 @@ If you absolutely sure that you will do, you can check it using very small walle
 
 ####**Algorithm in brief:**
 
-Send a message with the transaction to SNS topic such as: "1Ee1hrsvGsD3t5ZvSqpZNruq8QQYcrwZHK 1.7413". http://aws.amazon.com/sns/
+Send a message with the transaction to SNS topic such as: "1Ee1hrsvGsD3t5ZvSqpZNruq8QQYcrwZHK 1.7413".
+http://aws.amazon.com/sns/
 
 SNS message activates Lambda function. http://aws.amazon.com/lambda/
 
