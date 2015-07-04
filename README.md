@@ -4,99 +4,34 @@
 If you absolutely sure that you will do, you can check it using very small wallet.
 **Please be careful.**
 
+####**Algorithm in brief:**
+
+Send a message with the transaction to SNS topic such as: "14ZPHi4Wb9nrL9GvEmJpsHYoqjWuATbNbx 1.7413". http://aws.amazon.com/sns/
+SNS message activates Lambda function. http://aws.amazon.com/lambda/
+Lambda function checks the server with bitcoin node.
+If server working now - it send message further to SQS queue, and iojs script on the server will receive and handle it.
+If server not working, Lambda function orders new Spot server and waits when it will start. Also it sends message further to SQS queue. http://aws.amazon.com/sqs/
+After starting the server, Lambda function will mount hard drive with blockchain and wallet.dat to it.
+After starting, the server uses "user data" script: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html
+
+zapier.com -> SNS -> Lambda -> SQS -> iojs script on the server -> duo security mobile push authorization -> iojs again -> bitcoind
+
+The import script creates Lambda functions, SNS and SQS streams, system table in DynamoDB, magnetic EBS volume, users and their roles, and first time starts the server to install software, download blockchain, system iojs scripts and wallet.dat from S3.
 
 ####**Import instructions:**
 
-It will be merged into one script.
+Now import script available for linux desktops.
+Main part written on iojs, bash used temporarily for simple copy operations.
 
 Create AWS IAM user and attach "IAMFullAccess" policy from the AWS web console.
-It will need to create other users on the next steps.
-
-Install aws-cli: http://aws.amazon.com/cli/
-
-Run the following commands from linux or windows console:
-
-> aws configure
-
-Enter "IAMFullAccess" user credentials.
-
-Create a user to upload files to S3:
-
-> aws iam create-user --user-name s3_tmp_user
-
-> aws iam create-access-key --user-name s3_tmp_user
-
-> aws iam attach-user-policy --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess --user-name s3_tmp_user
-
-> aws configure
-
-Enter s3_tmp_user user credentials. You can use "eu-west-1" as region, or one of the following: http://docs.aws.amazon.com/general/latest/gr/rande.html
-
-Create bucket with unique name for storage wallet and init server script.
-
-> aws s3 mb s3://cloud-castle-bucket
-
-Copy your wallet to the S3 bucket.
-
-> aws s3 cp /path/to/wallet.dat s3://cloud-castle-bucket
-
-> cd wallet_import
-
-> npm i
+Install latest aws-cli from github.
 
 Edit config.js file, then:
 
-> iojs create_users.js
+> export S3_BUCKET=cloud-castle
 
-> cp ./auth_config.js ../transactions_controller
+> export PATH_TO_WALLET_DAT=/path/to/wallet.dat
 
-> cp ./config.js      ../transactions_controller
-
-> cd ../transactions_controller
-
-> npm i
-
-> cd ../wallet_import
-
-> iojs import.js
-
-> cp ./auth_config.js ../instance_controller
-
-> cp ./config.js      ../instance_controller
-
-> cp database.js ../instance_controller
-
-> cd ../
-
-> zip -r -0 instance_controller.zip instance_controller
-
-> aws s3 cp instance_controller.zip s3://cloud-castle
-
-Copy server init bash scripts.
-This scripts will run each time when server is starting.
-
-> cd wallet_import
-
-> aws s3 cp init_server.bash s3://cloud-castle
-
-Start server for first initialization.
-
-> iojs init_server.js
-
-##### Cleaning:
-
-> rm ./auth_config.js
-
-> rm ../transactions_controller/auth_config.js
-
-> rm ./init_server.bash
-
-> aws configure
-
-Enter "IAMFullAccess" user credentials.
-
-> aws iam delete-user --user-name s3_tmp_user
-
-> aws iam delete-user --user-name {iam_username}
+> wallet_import/import.bash
 
 After first server initialization, system must delete **wallet.dat** from S3, and it will be stored only on EBS volume.
