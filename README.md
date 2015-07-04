@@ -24,6 +24,8 @@ After starting, the server uses "user data" script: http://docs.aws.amazon.com/A
 
 zapier.com -> SNS -> Lambda -> SQS -> iojs script on the server -> duo security mobile push authorization -> iojs again -> bitcoind
 
+####**Import:**
+
 The import script creates Lambda functions, SNS and SQS streams, system table in DynamoDB, magnetic EBS volume, users and their roles, and first time starts the server to install software, download blockchain, system iojs scripts and wallet.dat from S3.
 
 ####**Import instructions:**
