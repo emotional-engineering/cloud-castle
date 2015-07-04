@@ -6,12 +6,18 @@ If you absolutely sure that you will do, you can check it using very small walle
 
 ####**Algorithm in brief:**
 
-Send a message with the transaction to SNS topic such as: "14ZPHi4Wb9nrL9GvEmJpsHYoqjWuATbNbx 1.7413". http://aws.amazon.com/sns/
+Send a message with the transaction to SNS topic such as: "1Ee1hrsvGsD3t5ZvSqpZNruq8QQYcrwZHK 1.7413". http://aws.amazon.com/sns/
+
 SNS message activates Lambda function. http://aws.amazon.com/lambda/
+
 Lambda function checks the server with bitcoin node.
+
 If server working now - it send message further to SQS queue, and iojs script on the server will receive and handle it.
+
 If server not working, Lambda function orders new Spot server and waits when it will start. Also it sends message further to SQS queue. http://aws.amazon.com/sqs/
+
 After starting the server, Lambda function will mount hard drive with blockchain and wallet.dat to it.
+
 After starting, the server uses "user data" script: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html
 
 zapier.com -> SNS -> Lambda -> SQS -> iojs script on the server -> duo security mobile push authorization -> iojs again -> bitcoind
