@@ -31,27 +31,27 @@ module.exports = {
         ebs_start_size   : 60
     },
     sns : {
-        inbound_transactions       : 'cloud_castle',
-        transactions_auth_requests : 'cloud_castle',
-        transactions_results       : 'cloud_castle',
-        spot_wait                  : 'cloud_castle',
-        instance_wait              : 'cloud_castle',
+        inbound_transactions       : 'cloud_castle_inbound_transactions',
+        transactions_auth_requests : 'cloud_castle_auth_requests',
+        transactions_results       : 'cloud_castle_results',
+        spot_wait                  : 'cloud_castle_spot_wait',
+        instance_wait              : 'cloud_castle_instance_wait',
     },
     sqs : {
-        pending_transactions      : 'cloud_castle',
-        transactions_auth_answers : 'cloud_castle',
+        pending_transactions      : 'cloud_castle_pending_transactions',
+        transactions_auth_answers : 'cloud_castle_auth_answers',
     },
     lambda : {
         controller : {
-            name    : 'cloud_castle',
+            name    : 'cloud_castle_controller',
             handler : 'controller.handler'
         },
         spot_wait :  {
-            name    : 'cloud_castle',
+            name    : 'cloud_castle_spot_wait',
             handler : 'spot_wait.handler'
         },
         instance_wait : {
-            name    : 'cloud_castle',
+            name    : 'cloud_castle_instance_wait',
             handler : 'instance_wait.handler'
         },
         package_files : ['config.js',
