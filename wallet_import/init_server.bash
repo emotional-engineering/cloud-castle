@@ -25,6 +25,7 @@ if grep -q mount <<< $MOUNT_ERROR; then
     add-apt-repository -y ppa:bitcoin/bitcoin
     apt-get update
     apt-get install -y git-core build-essential autoconf libtool libdb4.8++-dev libssl-dev libboost-all-dev libgtk2.0-dev
+    apt-get install -y awscli unzip
 
     cd $MOUNT_POINT
     git clone https://github.com/bitcoin/bitcoin.git ./bitcoind
@@ -47,18 +48,30 @@ if grep -q mount <<< $MOUNT_ERROR; then
     echo "rpcuser=$BITCOIND_USER" > bitcoin.conf
     echo "rpcpassword=$BITCOIND_PASS" >> bitcoin.conf
 
+    #git clone $SYSTEM_REPOSITORY ./cloud_castle
+
     cd $MOUNT_POINT
-    git clone $SYSTEM_REPOSITORY ./cloud_castle
+
+    export AWS_ACCESS_KEY_ID={{aws_s3_key_id}}
+    export AWS_SECRET_ACCESS_KEY={{aws_s3_key_secret}}
+    export AWS_DEFAULT_REGION={{aws_s3_region}}
+
+    aws s3 cp s3://cloud-castle/instance_controller.zip instance_controller.zip
+    unzip instance_controller.zip
+    cd $MOUNT_POINT/instance_controller
+    npm i
+    nohup iojs $MOUNT_POINT/instance_controller/main.js > $MOUNT_POINT/controller.log &
 
     #---remove_start---
-    echo '{{auth_config}}' > $MOUNT_POINT/cloud_castle/instance_controller/auth_config.js
-    echo "{{config}}" > $MOUNT_POINT/cloud_castle/instance_controller/config.js
+    #echo '{{auth_config}}' > $MOUNT_POINT/cloud_castle/instance_controller/auth_config.js
+    #echo "{{config}}" > $MOUNT_POINT/cloud_castle/instance_controller/config.js
     #---remove_end---
+
     
-    cp $MOUNT_POINT/cloud_castle/wallet_import/database.js $MOUNT_POINT/cloud_castle/instance_controller
-    cd $MOUNT_POINT/cloud_castle/instance_controller
-    npm i
-    nohup iojs $MOUNT_POINT/cloud_castle/instance_controller/main.js > $MOUNT_POINT/controller.log &
+    #cp $MOUNT_POINT/cloud_castle/wallet_import/database.js $MOUNT_POINT/cloud_castle/instance_controller
+    #cd $MOUNT_POINT/cloud_castle/instance_controller
+    #npm i
+    #nohup iojs $MOUNT_POINT/cloud_castle/instance_controller/main.js > $MOUNT_POINT/controller.log &
 
 else
 

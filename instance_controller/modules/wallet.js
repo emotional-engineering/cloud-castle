@@ -21,12 +21,25 @@ module.exports = function() {
 
             fs.stat(file_path, function(error, file_stat){
 
-                if (!error && file_stat)
+                if (error && error.toString().indexOf('no such file') == -1)
                 {
-                    resolve(true);
+                    return reject(error);
                 }
+
+                if (file_stat)
+                {
+                    return resolve(true);
+                }
+
+                console.log('downloading wallet.dat');
+
                 var bucket = config["s3"]["system_bucket"];
                 var key    = 'wallet.dat';
+
+                /*
+                    todo: add s3 check_file_exist function. otherwise writes an empty wallet file.
+                    Also, this function needs an attentive tests.
+                */
 
                 s3
                 .download_file(bucket, key, file_path)

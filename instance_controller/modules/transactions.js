@@ -104,6 +104,7 @@ module.exports = function() {
                 }
 
                 var message = data.Messages[0];
+
                 var data    = JSON.parse(message.Body);
 
                 var message_id     = message['MessageId'];

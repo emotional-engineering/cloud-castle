@@ -133,15 +133,10 @@ var create_users = function()
 
         var auth_config_body = "module.exports = " + JSON.stringify(config_object);
 
-        template
-            .replace_in_file('./init_server.bash', "{{auth_config}}", auth_config_body)
-            .then(function(result){
+        fs.writeFileSync('./auth_config.js', auth_config_body, 'utf8');
 
-                fs.writeFileSync('./auth_config.js', auth_config_body, 'utf8');
+        console.log("\n finish \n");
+        process.exit(1);
 
-                console.log("\n finish \n");
-                process.exit(1);
-
-            });
     });
 }

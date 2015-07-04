@@ -1,9 +1,10 @@
-var path     = require("path");
-var fs       = require("fs");
-var AWS      = require('aws-sdk');
-var colors   = require('colors');
-var argv     = require('optimist').argv;
-var config   = require('./config');
+var path        = require("path");
+var fs          = require("fs");
+var AWS         = require('aws-sdk');
+var colors      = require('colors');
+var argv        = require('optimist').argv;
+var config      = require('./config');
+var auth_config = require('./auth_config');
 
 var sqs      = require('./modules/sqs');
 var sns      = require('./modules/sns');
@@ -338,8 +339,15 @@ qconsole
 
     }).then(function(result){
 
-        var config_body = fs.readFileSync('./config.js', 'utf8');
-        return template.replace_in_file('./init_server.bash', "{{config}}", config_body);
+        return template.replace_in_file('./init_server.bash', "{{aws_s3_key_id}}", auth_config[config['username_prefix'] + "s3"]['accessKeyId']);
+
+    }).then(function(result){
+
+        return template.replace_in_file('./init_server.bash', "{{aws_s3_key_secret}}", auth_config[config['username_prefix'] + "s3"]['secretAccessKey']);
+
+    }).then(function(result){
+
+        return template.replace_in_file('./init_server.bash', "{{aws_s3_region}}", auth_config[config['username_prefix'] + "s3"]['region']);
 
     }).then(function(result){
 

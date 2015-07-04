@@ -7,6 +7,8 @@ If you absolutely sure that you will do, you can check it using very small walle
 
 ####**Import instructions:**
 
+It will be merged into one script.
+
 Create AWS IAM user and attach "IAMFullAccess" policy from the AWS web console.
 It will need to create other users on the next steps.
 
@@ -58,10 +60,24 @@ Edit config.js file, then:
 
 > iojs import.js
 
+> cp ./auth_config.js ../instance_controller
+
+> cp ./config.js      ../instance_controller
+
+> cp database.js ../instance_controller
+
+> cd ../
+
+> zip -r -0 instance_controller.zip instance_controller
+
+> aws s3 cp instance_controller.zip s3://cloud-castle
+
 Copy server init bash scripts.
 This scripts will run each time when server is starting.
 
-> aws s3 cp init_server.bash s3://cloud-castle-bucket
+> cd wallet_import
+
+> aws s3 cp init_server.bash s3://cloud-castle
 
 Start server for first initialization.
 
@@ -83,10 +99,4 @@ Enter "IAMFullAccess" user credentials.
 
 > aws iam delete-user --user-name {iam_username}
 
-After first server initialization, system must delete **wallet.dat** from S3.
-
-Also **s3://cloud-castle-bucket/init_server.bash** must be cleared from lines, which contain configuration information.
-
-Check that **s3://cloud-castle-bucket/** consist only **init_server.bash**, and no authorization data inside it.
-
-Now you **wallet.dat** and **auth_config.js** file with AWS credentials must be store only on EBS volume.
+After first server initialization, system must delete **wallet.dat** from S3, and it will be stored only on EBS volume.

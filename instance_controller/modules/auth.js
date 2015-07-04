@@ -1,17 +1,25 @@
-var auth_config = require('../auth_config');
-var config      = require('../config.js');
-var AWS         = require('aws-sdk');
-
-var sns         = new AWS.SNS(auth_config[config['username_prefix'] + "sns"]);
-var sqs         = new AWS.SQS(auth_config[config['username_prefix'] + "sqs"]);
-
-var database     = require('../database');
-var transactions = require('./transactions');
-
-database = new database();
-transactions = new transactions();
-
+var fs    = require('fs');
+var path  = require('path');
+var async = require('async');
 var EventEmitter  = require('events').EventEmitter;
+
+var auth_modules = [];
+var auth_modules_path = path.normalize(__dirname + '/../' + 'auth_modules');
+
+fs.readdirSync(auth_modules_path).forEach(function(auth_module) {
+
+    console.log('auth module connected:', auth_module);
+
+    var module_index = auth_modules_path + '/' + auth_module + '/index.js';
+
+    var new_module_i = auth_modules.length;
+
+    auth_modules[new_module_i] = require(module_index);
+    auth_modules[new_module_i] = new auth_modules[new_module_i]();
+
+    return true;
+
+});
 
 module.exports = function() {
 
@@ -20,9 +28,6 @@ module.exports = function() {
     this.event_emitter = new EventEmitter();
 
     this.active_transactions = [];
-
-    this.transactions_auth_sns_request = false;
-    this.transactions_auth_sqs_answer  = false;
 
     this.get_state = function()
     {
@@ -36,172 +41,46 @@ module.exports = function() {
         }
     }
 
-    this.connect = function()
-    {
-
-        if (!self.transactions_auth_sns_request)
-        {
-            database
-                .get('transactions_auth_requests')
-                .then(function(sns_arn){
-
-                    self.transactions_auth_sns_request = sns_arn['value']['S'];
-
-                    return transactions.get_queue_url(config['sqs']['transactions_auth_answers']);
-
-                }).then(function(sqs_arn){
-
-                    self.transactions_auth_sqs_answer = sqs_arn;
-
-                    return self.get();
-                })
-                .then(self.connect)
-                .catch(function(error){
-                    console.log(error);
-                });
-        }
-        else
-        {
-            self.get()
-                .then(self.connect)
-                .catch(function(error){
-                    console.log(error);
-                });
-        }
-    }
-
     this.request = function(transaction)
     {
-
         return new Promise(function(resolve, reject){
 
-            self.active_transactions[transaction.transaction_key] = transaction;
+            async.map(auth_modules, function(module, callback) {
 
-            var message = transaction.address + ' ' + transaction.amount + ' ' + transaction.transaction_key;
+                module
+                    .auth(transaction)
+                    .then(function(result){
 
-            var params = {
-                "Message"  : message,
-                "TopicArn" : self.transactions_auth_sns_request
-            };
+                        console.log(module.get_name(), 'auth result:', result);
 
-            sns.publish(params, function(err, data) {
+                        callback(false, result);
 
-                if (!err){
-                    resolve(data);
-                } else {
-                    reject(err);
-                }
-            });
-        });
-    }
+                    }).catch(function(error){
 
-    /*
-        Obtaining authorization messages.
-    */
+                        callback(error, false);
 
-    this.get = function()
-    {
-        return new Promise(function(resolve, reject){
+                    });
 
-            var sqs_params = {
-                "QueueUrl"            : self.transactions_auth_sqs_answer,
-                "MaxNumberOfMessages" : 1,
-                "VisibilityTimeout"   : 60,
-                "WaitTimeSeconds"     : 20
-            }
+            }, function(error, auth_results) {
 
-            sqs.receiveMessage(sqs_params, function(err, data){
-
-                if(err){
-                    return reject(err);
-                }
-                else if (!data.Messages)
+                if (error)
                 {
-                    return resolve(false);
+                    return reject(error);
                 }
 
-                var message = data.Messages[0];
+                var final_auth = true;
 
-                var decoded_message = new Buffer(message['Body'], 'base64').toString('utf8');
-                var receipt         = message['ReceiptHandle'];
+                auth_results.forEach(function(auth_result){
 
-                var message_data = decoded_message.split("\r\n");
-
-                /*
-                    The password is not used now.
-                */
-
-                var password_string = message_data[0];
-                password_string     = password_string.split(" ");
-                var password        = password_string[0];
-
-                console.log('password:', password);
-
-                var transaction_key = false;
-
-                /*
-                    Search transaction key in inbound message.
-                */
-
-                for (var i = 1; i < message_data.length; i++)
-                {
-
-                    var string_data = message_data[i].split(' ');
-
-                    for (var j = 0; j < string_data.length; j++)
+                    if (auth_result == false)
                     {
-                        var test_key = string_data[j];
-
-                        if (self.active_transactions[test_key])
-                        {
-                            transaction_key = test_key;
-                            break;
-                        }
+                        final_auth = false;
                     }
-                };
+                });
 
-                if (!transaction_key)
-                {
-                    self.remove_from_queue(receipt);
-                    return resolve(false);
-                }
-
-                console.log('transaction_key:', transaction_key);
-
-                var transaction = self.active_transactions[transaction_key];
-
-                delete self.active_transactions[transaction_key];
-
-                self.event_emitter.emit('accepted_transaction', transaction);
-
-                self.remove_from_queue(receipt);
-
-                return resolve(true);
+                resolve(final_auth);
 
             });
         });
-    }
-
-    this.remove_from_queue = function(receipt) {
-
-        var sqs_params = {
-            "QueueUrl"      : self.transactions_auth_sqs_answer,
-            "ReceiptHandle" : receipt
-        }
-
-        sqs.deleteMessage(sqs_params, function(err, data) {
-            // ------
-        });
-    };
-
-    this.make_key = function(length)
-    {
-        var text = "";
-        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-        for( var i=0; i < length; i++ )
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-        return text;
     }
 }

@@ -33,12 +33,15 @@ module.exports = function() {
 
                 if (exec_error)
                 {
+                    console.log('daemon start error:');
+                    console.log(exec_error);
                     error = exec_error;
                 }
 
             });
 
             daemon.on('exit', function (code) {
+
                 if (code === 0 && !error)
                 {
                     resolve(true);
@@ -125,10 +128,14 @@ module.exports = function() {
 
                 error = error.toString();
 
-                if (error.indexOf('Rescanning') > -1 || error.indexOf('Verifying wallet') > -1 || error.indexOf('Loading block index') > -1)
+                if (error.indexOf('Rescanning') > -1 ||
+                    error.indexOf('Verifying') > -1 ||
+                    error.indexOf('Loading block index') > -1 ||
+                    error.indexOf("couldn't connect to server") > -1) // todo: limit to repeat this error
                 {
 
-                    console.log('initialization...');
+                    console.log('initialization:');
+                    console.log(error);
 
                     setTimeout(function(){
 
@@ -138,7 +145,7 @@ module.exports = function() {
                 }
                 else
                 {
-                    console.log('error:');
+                    console.log('daemon error:');
                     console.log(error);
 
                     __callback(error, false);
