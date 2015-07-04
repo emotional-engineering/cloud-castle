@@ -4,7 +4,7 @@ module.exports = {
     */
     region : 'us-east-1',
     zone   : 'us-east-1e',
-    username_prefix : 'cloud_castle112_',
+    username_prefix : 'cloud_castle_',
     /*
     Create a random user name and password for bitcoind.
     */
@@ -21,8 +21,8 @@ module.exports = {
         initial_script : 'init_server.bash'
     },
     ec2 : {
-        security_group   : 'cloud_castle112',
-        keypair_name     : 'cloud_castle112',
+        security_group   : 'cloud_castle',
+        keypair_name     : 'cloud_castle',
         ami              : 'ami-d05e75b8', /* find in the selected region AMI with Ubuntu Server 14.04 LTS  */
         instance_type    : 'm3.medium',
         max_spot_price   : 0.015,
@@ -31,27 +31,27 @@ module.exports = {
         ebs_start_size   : 60
     },
     sns : {
-        inbound_transactions       : 'cloud_castle_inbound_transactions112',
-        transactions_auth_requests : 'cloud_castle_auth_requests112',
-        transactions_results       : 'cloud_castle_results112',
-        spot_wait                  : 'cloud_castle_spot_wait112',
-        instance_wait              : 'cloud_castle_instance_wait112',
+        inbound_transactions       : 'cloud_castle_inbound_transactions',
+        transactions_auth_requests : 'cloud_castle_auth_requests',
+        transactions_results       : 'cloud_castle_results',
+        spot_wait                  : 'cloud_castle_spot_wait',
+        instance_wait              : 'cloud_castle_instance_wait',
     },
     sqs : {
-        pending_transactions      : 'cloud_castle_pending_transactions112',
-        transactions_auth_answers : 'cloud_castle_auth_answers112',
+        pending_transactions      : 'cloud_castle_pending_transactions',
+        transactions_auth_answers : 'cloud_castle_auth_answers',
     },
     lambda : {
         controller : {
-            name    : 'cloud_castle_controller112',
+            name    : 'cloud_castle_controller',
             handler : 'controller.handler'
         },
         spot_wait :  {
-            name    : 'cloud_castle_spot_wait112',
+            name    : 'cloud_castle_spot_wait',
             handler : 'spot_wait.handler'
         },
         instance_wait : {
-            name    : 'cloud_castle_instance_wait112',
+            name    : 'cloud_castle_instance_wait',
             handler : 'instance_wait.handler'
         },
         package_files : ['config.js',
@@ -60,9 +60,9 @@ module.exports = {
                          'modules']
     },
     iam : {
-        lambda_execution_role : 'cloud_castle112'
+        lambda_execution_role : 'cloud_castle'
     },
     dynamodb : {
-        data_table_name : 'cloud_castle112',
+        data_table_name : 'cloud_castle',
     },
 }
