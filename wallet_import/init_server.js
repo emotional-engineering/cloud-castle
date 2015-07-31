@@ -21,7 +21,7 @@ var price_difference = config['ec2']['price_difference'];
 
 ec2.get_spot_price(zone, instance_type, function(error, spot_price){
 
-    spot_price = spot_price + 0.001;
+    spot_price = spot_price + price_difference;
 
     if (spot_price > max_spot_price)
     {

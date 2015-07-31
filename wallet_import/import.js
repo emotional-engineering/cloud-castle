@@ -24,7 +24,8 @@ template = new template();
 qconsole = new qconsole();
 database = new database();
 
-const zipfile_path = __dirname + "/lambda.zip";
+const zipfile_path     = __dirname + "/lambda.zip";
+const init_bash_script = './' + config['s3']['initial_script'];
 
 var tmp_topic_arn         = false;
 var lambda_execution_role = false;
@@ -142,6 +143,10 @@ qconsole
 
         console.log("\n", "security group created:", "\n");
         console.log(result);
+
+        return database.set('security_group_id', result['GroupId']);
+
+    }).then(function(result){
 
         var topic_name = config['sns']['inbound_transactions'];
 
@@ -339,23 +344,23 @@ qconsole
 
     }).then(function(result){
 
-        return template.replace_in_file('./init_server.bash', "{{aws_s3_key_id}}", auth_config[config['username_prefix'] + "s3"]['accessKeyId']);
+        return template.replace_in_file(init_bash_script, "{{aws_s3_key_id}}", auth_config[config['username_prefix'] + "s3"]['accessKeyId']);
 
     }).then(function(result){
 
-        return template.replace_in_file('./init_server.bash', "{{aws_s3_key_secret}}", auth_config[config['username_prefix'] + "s3"]['secretAccessKey']);
+        return template.replace_in_file(init_bash_script, "{{aws_s3_key_secret}}", auth_config[config['username_prefix'] + "s3"]['secretAccessKey']);
 
     }).then(function(result){
 
-        return template.replace_in_file('./init_server.bash', "{{aws_s3_region}}", auth_config[config['username_prefix'] + "s3"]['region']);
+        return template.replace_in_file(init_bash_script, "{{aws_s3_region}}", auth_config[config['username_prefix'] + "s3"]['region']);
 
     }).then(function(result){
 
-        return template.replace_in_file('./init_server.bash', "{{bitcoind_user}}", config['bitcoind']['user']);
+        return template.replace_in_file(init_bash_script, "{{bitcoind_user}}", config['bitcoind']['user']);
 
     }).then(function(result){
 
-        return template.replace_in_file('./init_server.bash', "{{bitcoind_pass}}", config['bitcoind']['pass']);
+        return template.replace_in_file(init_bash_script, "{{bitcoind_pass}}", config['bitcoind']['pass']);    
 
     }).then(function(result){
 
