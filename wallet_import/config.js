@@ -5,6 +5,9 @@ module.exports = {
     region : 'us-east-1',
     zone   : 'us-east-1e',
     username_prefix : 'cloud_castle_',
+    account_id : "*",
+    billing_bucket : "cloud-castle-traffic-billing",
+    data_transfer_max_cost : 1.7, // the maximum cost you are willing to pay for outgoing traffic per month, USD value - "1.48". "0" to close port
     /*
     Create a random user name and password for bitcoind.
     */
