@@ -6,7 +6,7 @@ var AWS           = require('aws-sdk');
 var sns = new AWS.SNS(auth_config[common_config['username_prefix'] + "sns"]);
 var sqs = new AWS.SQS(auth_config[common_config['username_prefix'] + "sqs"]);
 
-var database     = require('../../database');
+var database     = require('../../modules/database');
 var transactions_module = require('../../modules/transactions');
 
 database = new database();

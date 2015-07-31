@@ -3,9 +3,14 @@
   "description": "bitcoin cloud wallet",
   "author": " <emotional-engineering@github>",
   "dependencies": {
-    "async"    : "=1.2.1",
-    "aws-sdk"  : "=2.1.34",
-    "bitcoin"  : "=2.3.2"
+    "async"       : "=1.2.1",
+    "aws-sdk"     : "=2.1.34",
+    "bitcoin"     : "=2.3.2",
+    "aws-billing" : "=1.0.0",
+    "bitcore"     : "=0.12.12",
+    "bitcore-p2p" : "=0.14.2",
+    "bluebird"    : "=2.9.34",
+    "moment"      : "=2.10.3"
   },
   "engines": {
       "iojs": ">=1.1.3"

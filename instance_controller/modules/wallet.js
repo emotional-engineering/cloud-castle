@@ -73,4 +73,124 @@ module.exports = function() {
             });
         });
     }
+
+    this.listunspent = function(address, confirmations)
+    {
+
+        return new Promise(function(resolve, reject){
+
+            bitcoin_client.listUnspent(confirmations, function(err, info, resHeaders) {
+
+                if (err) {
+                    return reject(err);
+                }
+
+                var txout = false;
+
+                for (var i = 0; i < info.length; i++)
+                {
+                    if (info[i].address == address)
+                    {
+                        txout = info[i];
+                        break
+                    }
+                }
+
+                resolve(txout);
+            });
+        });
+    }
+
+    this.create_address = function(account)
+    {
+        return new Promise(function(resolve, reject){
+
+            bitcoin_client.getNewAddress(account, function(err, address, resHeaders) {
+
+                if (err) {
+                    return reject(err);
+                }
+
+                resolve(address);
+            });
+        });
+    }
+
+    this.dumpprivkey = function(address)
+    {
+        return new Promise(function(resolve, reject){
+
+            bitcoin_client.dumpPrivKey(address, function(err, key, resHeaders) {
+
+                if (err) {
+                    return reject(err);
+                }
+
+                resolve(key);
+            });
+        });
+    }
+
+    this.import_private_key = function(args)
+    {
+        return new Promise(function(resolve, reject){
+
+            wif_key = args[0];
+            rescan  = args[1];
+
+            bitcoin_client.importPrivKey(wif_key, "", rescan, function(err, result, resHeaders) {
+
+                if (err) {
+                    return reject(err);
+                }
+
+                resolve(true);
+            });
+        });
+    }
+
+    this.get_peers = function()
+    {
+        return new Promise(function(resolve, reject){
+
+            bitcoin_client.getPeerInfo(function(err, result, resHeaders) {
+
+                if (err) {
+                    return reject(err);
+                }
+
+                resolve(result);
+            });
+        });
+    }
+
+    this.send_raw_transaction = function(raw)
+    {
+        return new Promise(function(resolve, reject){
+
+            bitcoin_client.sendRawTransaction(raw, function(err, result, resHeaders) {
+
+                if (err) {
+                    return reject(err);
+                }
+
+                resolve(result);
+            });
+        });
+    }
+
+    this.send_many = function(addresses_data)
+    {
+        return new Promise(function(resolve, reject){
+
+            bitcoin_client.sendMany("", addresses_data, function(err, info, resHeaders) {
+
+                if (err) {
+                    return reject(err);
+                }
+
+                resolve(info);
+            });
+        });
+    }
 }

@@ -6,6 +6,10 @@ var EventEmitter  = require('events').EventEmitter;
 var auth_modules = [];
 var auth_modules_path = path.normalize(__dirname + '/../' + 'auth_modules');
 
+/*
+    modules will executing in parallel
+*/
+
 fs.readdirSync(auth_modules_path).forEach(function(auth_module) {
 
     console.log('auth module connected:', auth_module);

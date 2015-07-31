@@ -1,7 +1,6 @@
 var AWS    = require('aws-sdk');
-var ec2    = require('modules/ec2.js');
-var events = require('modules/events.js');
-
+var ec2    = require('./modules/ec2.js');
+var events = require('./modules/events.js');
 ec2    = new ec2();
 events = new events();
 
@@ -68,6 +67,8 @@ var wait_spot_fulfilled = function(request_id, __callback)
             clearInterval(interval);
             return __callback(false, false);
         }
+
+        console.log('wait spot fulfilled', seconds_in_work);
 
         ec2.spot_status(request_id, function(error, instance_id){
 

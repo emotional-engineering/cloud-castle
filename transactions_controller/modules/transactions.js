@@ -3,10 +3,12 @@ var config      = require('../config');
 var AWS         = require('aws-sdk');
 var sqs         = new AWS.SQS(auth_config[config['username_prefix'] + "sqs"]);
 
+//var bitcore = require('bitcore');
+
 var EventEmitter  = require('events').EventEmitter;
 
 module.exports = function() {
-
+    
     var self = this;
 
     this.event_emitter = new EventEmitter();
@@ -38,7 +40,7 @@ module.exports = function() {
             });
         });
     }
-
+    
     /*
     todo: move to sqs module
     */
@@ -62,5 +64,5 @@ module.exports = function() {
                 __callback(err, false);
             }
         });
-    }
+    }     
 }

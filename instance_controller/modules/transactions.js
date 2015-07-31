@@ -7,7 +7,7 @@ var sqs         = new AWS.SQS(auth_config[config['username_prefix'] + "sqs"]);
 
 var EventEmitter  = require('events').EventEmitter;
 
-var database = require('../database');
+var database = require('./database');
 database     = new database();
 
 module.exports = function() {
@@ -18,7 +18,7 @@ module.exports = function() {
 
     this.pending_transactions = [];
 
-    this.pending_transactions_sqs_url = false;
+    this.pending_transactions_queue_url = false;
     this.transactions_results_sqs_url = false;
 
     this.get_state = function()
@@ -45,12 +45,10 @@ module.exports = function() {
             self
                 .get_queue_url(config["sqs"]["pending_transactions"])
                 .then(function(queue_url){
-
                     self.pending_transactions_queue_url = queue_url;
-                    return database.get('transactions_results');
+                    return database.get({ 'key' : 'transactions_results'});
                 })
                 .then(function(sns_topic){
-
                     self.transactions_results_sqs_url = sns_topic.value.S;
                     return self.get();
                 })
@@ -85,7 +83,7 @@ module.exports = function() {
     this.get = function()
     {
         return new Promise(function(resolve, reject){
-
+            
             var sqs_params = {
                 "QueueUrl"            : self.pending_transactions_queue_url,
                 "MaxNumberOfMessages" : 1,

@@ -76,7 +76,7 @@ module.exports = function() {
             });
         });
     }
-
+    
     this.wait_ready = function()
     {
         return new Promise(function(resolve, reject){
@@ -152,7 +152,11 @@ module.exports = function() {
                 }
             });
     }
-
+    
+    /*
+        todo: change to bitcoin-cli getblockchaininfo
+    */
+    
     this.get_blockchain_blockcount = function()
     {
 

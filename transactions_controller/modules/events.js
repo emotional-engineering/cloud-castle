@@ -2,6 +2,7 @@ var auth_config = require('../auth_config');
 var config      = require('../config');
 var AWS         = require('aws-sdk');
 var database    = require('./database');
+var Promise     = require("bluebird");
 
 var sns  = new AWS.SNS(auth_config[config['username_prefix']  + "sns"]);
 database = new database();
@@ -16,7 +17,6 @@ module.exports = function() {
 
     this.spot_wait = function(request_id, __callback)
     {
-
         database.get('spot_wait_sns_topic', function(error, result){
 
             if(error)
@@ -38,7 +38,7 @@ module.exports = function() {
             };
 
             sns.publish(params, function(err, data) {
-                    __callback(err, data);
+                __callback(err, data);
             });
         });
     }
