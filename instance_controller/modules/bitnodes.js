@@ -46,11 +46,12 @@ module.exports = function() {
 
             var url = 'snapshots/' + timestamp + '/';
 
-            self.api_request(url).then(function(data){
-
-                var nodes = data["nodes"];
-
-            });
+            self.api_request(url).then(function(data){                  
+                  var nodes = data["nodes"];
+                  resolve(nodes);
+              }).catch(function(error){
+                  reject(error);
+              });
         });
     }
 
@@ -75,19 +76,15 @@ module.exports = function() {
                 });
 
                 res.on('end', function() {
-
                     data = JSON.parse(data);
-
                     resolve(data);
-
                 });
-
             });
 
             req.end();
 
-            req.on('error', function(e) {
-              console.error(e);
+            req.on('error', function(error) {
+                reject(error);
             });
         });
     }
