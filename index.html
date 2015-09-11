@@ -1,0 +1,233 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Cloud setup by emotional-engineering</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    <script src="https://code.jquery.com/jquery-2.1.4.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.46.min.js"></script>
+
+    <style>
+
+        legend div {
+            margin-top    : 50px;
+            margin-bottom : 50px;
+            margin-left   : 10px;
+        }
+
+        label {
+            font-weight : normal;
+            font-weight : 500 !important;
+        }
+
+        h3 {
+            font          : 300 22px/1.5 Lato,"Helvetica Neue",Helvetica,Arial,sans-serif;
+            color         : #494949;
+            line-height   : 1.1;
+            margin-bottom : 20px;
+        }
+
+        form {
+            margin-bottom : 100px;
+        }
+
+    </style>
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>cloud installation</h1>
+        <p></p>
+
+        <p class="view"><a href="https://github.com/emotional-engineering/cloud-castle">View the Project on GitHub <small>emotional-engineering/cloud-castle</small></a></p>
+
+        <ul>
+          <li><a href="https://github.com/emotional-engineering/cloud-castle/zipball/pre-alfa">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/emotional-engineering/cloud-castle/tarball/pre-alfa">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/emotional-engineering/cloud-castle">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+
+          <h3>
+              <a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span class="octicon octicon-link"></span></a>
+              Setup full bitcoin node wallet on your own AWS cloud resources, using github javascript page, and connect it to the facebook and many other social services
+          </h3>
+
+          <p>
+
+              <form class="form-horizontal">
+                  <fieldset>
+
+                      <div class="form-group">
+                        <label class="col-md-4 control-label" for="keyid">iam keyid</label>
+                        <div class="col-md-4">
+                            <input id="keyid" name="keyid" type="text" placeholder="" class="form-control input-md" required="">
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label class="col-md-4 control-label" for="keysecret">iam keysecret</label>
+                        <div class="col-md-4">
+                            <input id="keysecret" name="keysecret" type="text" placeholder="" class="form-control input-md" required="">
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label class="col-md-4 control-label" for="keysecret">sns status email</label>
+                        <div class="col-md-4">
+                            <input id="email" name="email" type="text" placeholder="" class="form-control input-md" required="">
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label class="col-md-4 control-label" for="setup_button"></label>
+                        <div class="col-md-4">
+                          <button id="setup_button" name="setup_button" class="btn btn-primary">setup</button>
+                        </div>
+                      </div>
+
+                  </fieldset>
+              </form>
+          </p>
+
+          <p>Having trouble with Pages? Check out our <a href="https://help.github.com/pages">documentation</a> or <a href="https://github.com/contact">contact support</a> and we’ll help you sort it out.</p>
+
+      </section>
+      <footer>
+        <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+        <p><small>This project is maintained by <a href="https://github.com/emotional-engineering">emotional-engineering</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+
+    <script type="text/javascript">
+
+        var done = false;
+
+        $('#setup_button').on('click', function(event) {
+
+            event.preventDefault();
+
+            if (done)
+            {
+                return false;
+            }
+
+            done = true;
+
+            var keyid     = $("#keyid").val();
+            var keysecret = $("#keysecret").val();
+            var email     = $("email").val();
+            var key_name  = "tmp_delete";
+
+            var auth_config = {
+                "accessKeyId"     : keyid,
+                "secretAccessKey" : keysecret,
+                "region"          : "us-east-1"
+            }
+
+            var ec2 = new AWS.EC2(auth_config);
+
+            var params = {
+                KeyName : key_name,
+            };
+
+            ec2.createKeyPair(params, function(err, key_not_saved) {
+
+                if (err)
+                {
+                    console.log(err);
+                }
+
+                var init_script_content = [
+                    "#!/bin/bash",
+                    "apt-get update",
+                    "apt-get install -y git-core build-essential zip",
+                    "cd /home/ubuntu",
+                    "git clone https://github.com/nodejs/node.git ./nodejs",
+                    "cd nodejs && ./configure && make -j4 && make install",
+                    "cd /home/ubuntu",
+                    "git clone -b pre-alfa https://github.com/emotional-engineering/cloud-castle.git",
+                    "cd castle_setup/instance_controller",
+                    "npm i",
+                    "cd ../transactions_controller",
+                    "npm i",
+                    "cd ../wallet_import",
+                    "npm i",
+                    "sed -i -e 's/{resources_name}/cloud-castle-auto/g' ./config.js",
+                    "node import.js -i " + auth_config.accessKeyId + " -s " + auth_config.secretAccessKey + " -e " + email + " > install.log",
+                ]
+
+                var init_script_content = init_script_content.join("\n");
+
+                console.log(init_script_content);
+
+                var init_script_content =  btoa(init_script_content);
+
+                var params = {
+                    "ImageId"      : "ami-d05e75b8", // ubuntu 14
+                    'KeyName'      : key_name,
+                    "InstanceType" : "t2.medium",
+                    "MinCount"     : 1,
+                    "MaxCount"     : 1,
+                    /*"Placement": {
+                        "AvailabilityZone" : zone
+                    },*/
+                    "UserData" : init_script_content
+                };
+
+                ec2.runInstances(params, function(err, data) {
+
+                    if (err)
+                    {
+                        console.log(err);
+                        document.location = "error.html";
+                        return false;
+                    }
+
+                    var instanceId = data.Instances[0].InstanceId;
+                    console.log("Created instance", instanceId);
+
+                    params = {Resources: [instanceId], Tags: [
+                        {
+                            Key   : 'Name',
+                            Value : 'cloud-castle-setup'
+                        }
+                    ]};
+
+                    ec2.createTags(params, function(err) {
+
+                        if (err)
+                        {
+                            console.log(err);
+                            document.location = "error.html";
+                            return false;
+                        }
+
+                        console.log("Tagging instance", err ? "failure" : "success");
+
+                        document.location = "done.html";
+                        return true;
+
+                    });
+                });
+            });
+        });
+
+    </script>
+
+  </body>
+</html>
