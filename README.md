@@ -1,5 +1,7 @@
 ##You own full bitcoin node in Amazon Compute Cloud.
 
+### cloud installation: http://emotional-engineering.github.io/cloud-castle/
+
 ####**PRE-ALFA VERSION, NOT STABLE AND NOT TESTED, DON'T USE IT NOW**, if you are not an nodejs and AWS expert.
 If you absolutely sure that you will do, you can check it using very small wallet.
 **Please be careful.**
